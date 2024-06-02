@@ -37,7 +37,7 @@ const Login = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={styles.backgroundContainer}>
             <KeyboardAvoidingView behavior="padding">
                 {/* Email */}
                 <TextInput 

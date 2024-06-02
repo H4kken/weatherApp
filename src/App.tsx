@@ -1,22 +1,22 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './screens/login';
+import Login from './screens/Login';
 import Home from './screens/Home';
-import Details from './screens/details';
 import Settings from './screens/Settings';
 import { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_APP, FIREBASE_AUTH } from '../FirebaseConfig';
 import Splash from './screens/Splash';
+import { MMKV } from 'react-native-mmkv'
 
+export const storage = new MMKV()
 const Stack = createNativeStackNavigator();
 const InsideStack = createNativeStackNavigator();
 
 function InsideLayout() {
   return (
-    <InsideStack.Navigator>
+    <InsideStack.Navigator screenOptions={{ headerShown: false }}>
       <InsideStack.Screen name='Home ' component={Home}/>
-      <InsideStack.Screen name='Details' component={Details}/>
       <InsideStack.Screen name='Settings' component={Settings}/>
     </InsideStack.Navigator>
   );
@@ -29,7 +29,9 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(FIREBASE_APP), (user) => {
       setUser(user);
-      if (initializing) setInitializing(false);
+      if (initializing){
+        setInitializing(false);
+      }
     });
     return () => unsubscribe();
   }, []);
