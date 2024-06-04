@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, ActivityIndicator, PermissionsAndroid, Platform, Image, Dimensions } from 'react-native';
-import Geolocation from '@react-native-community/geolocation';
 import { NavigationProp } from '@react-navigation/native';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { storage } from '../App';
 import { styles } from '../styles/Styles';
 import NetInfo from '@react-native-community/netinfo';
 import LinearGradient from 'react-native-linear-gradient';
+import Geolocation from '@react-native-community/geolocation';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,12 +18,12 @@ const API_KEY = '8cfe2efbcc0ae4915b803edcdb2c8f71';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 // Function to save the JSON to storage
-const saveMeteoJson = (meteoJson: JSON) => {
+export const saveMeteoJson = (meteoJson: JSON) => {
   storage.set('meteoJson', JSON.stringify(meteoJson));
 };
 
 // Function to retrieve JSON object from MMKV storage
-const getMeteoJson = () => {
+export const getMeteoJson = () => {
   const meteoJsonString = storage.getString('meteoJson');
   if (meteoJsonString) {
     // JSON object already exists in storage, return it
@@ -34,10 +34,10 @@ const getMeteoJson = () => {
   }
 };
 
-const getBackgroundColor = (weatherDescription: string, iconCode: string, temperature: number) => {
-  const maxTemp = 40; // maximum temperature for the gradient
-  const minTemp = -10; // minimum temperature for the gradient
-  const tempRatio = (temperature - minTemp) / (maxTemp - minTemp); // ratio of the current temperature to the maximum temperature
+export const getBackgroundColor = (weatherDescription: string, iconCode: string, temperature: number) => {
+  const maxTemp = 40;
+  const minTemp = -10;
+  const tempRatio = (temperature - minTemp) / (maxTemp - minTemp);
 
   let startColor1, endColor1, startColor2, endColor2;
 
@@ -65,23 +65,23 @@ const getBackgroundColor = (weatherDescription: string, iconCode: string, temper
     case 'thunderstorm':
       if (iconCode.endsWith('d')) {
         // rain during the day
-        startColor1 = '#0000FF';
-        endColor1 = '#800080';
-        startColor2 = 'ffd900'; // orange
-        endColor2 = '#ff7f00'; // yellow
+        startColor1 = '#313036'; // darker grey
+        endColor1 = '#444444'; // dark grey
+        startColor2 = '#1b155d'; // dark blue
+        endColor2 = '#035aa6'; // lighter blue
       } else {
         // rain at night
-        startColor1 = '#800080';
-        endColor1 = '#00008B';
-        startColor2 = '#ff7f00'; // orange
-        endColor2 = 'ffd900'; // yellow
+        startColor1 = '#1b155d'; // dark blue
+        endColor1 = '#035aa6'; // lighter blue
+        startColor2 = '#313036'; // darker grey
+        endColor2 = '#444444'; // dark grey
       }
       break;
     default:
-      startColor1 = '#D3D3D3';
-      endColor1 = '#D3D3D3';
-      startColor2 = '#ff7f00'; // orange
-      endColor2 = 'ffd900'; // yellow
+      startColor1 = '#fa85b2'; // pink
+      endColor1 = '#ff00b1'; // peach
+      startColor2 = '#ffd900'; // orange
+      endColor2 = '#ff7f00'; // yellow
   }
 
   const r1 = parseInt(startColor1.slice(1, 3), 16);
@@ -109,19 +109,19 @@ const getBackgroundColor = (weatherDescription: string, iconCode: string, temper
   return [`rgb(${r}, ${g}, ${b})`, `rgb(${r_}, ${g_}, ${b_})`];
 };
 
-async function fetchWeatherData(latitude: number, longitude: number): Promise<any> {
+export async function fetchWeatherData(latitude: number, longitude: number): Promise<any> {
   const url = `${BASE_URL}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`;
   const response = await fetch(url);
   const data = await response.json();
   return data;
 }
 
-function useInternetConnection() {
+export function useInternetConnection() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
-        state.isConnected != null ? setIsConnected(state.isConnected) : null;
+      state.isConnected != null ? setIsConnected(state.isConnected) : null;
     });
 
     return () => {
@@ -132,30 +132,30 @@ function useInternetConnection() {
   return isConnected;
 }
 
-async function requestLocationPermission() {
-    if (Platform.OS === 'android') {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Location permission granted');
-                return true;
-            } else {
-                console.log('Location permission denied');
-                return false;
-            }
-        } catch (err) {
-            console.warn(err);
-            return false;
-        }
-    } else {
-        Geolocation.requestAuthorization();
+export async function requestLocationPermission() {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Location permission granted');
         return true;
+      } else {
+        console.log('Location permission denied');
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
     }
+  } else {
+    Geolocation.requestAuthorization();
+    return true;
+  }
 }
 
-async function fetchCurrentLocationWeatherData(): Promise<any> {
+export async function fetchCurrentLocationWeatherData(): Promise<any> {
   const hasLocationPermission = await requestLocationPermission();
   if (!hasLocationPermission) {
     throw new Error('Location permission denied');
@@ -187,8 +187,8 @@ const Home = ({ navigation }: RouterProps) => {
   const isConnected = useInternetConnection();
 
   const date = new Date();
-  const day = date.getDay() < 10 ? `0${date.getDay()}` : date.getDay();
-  const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth();
+  const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+  const month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
 
   useEffect(() => {
     // If the device is connected to the internet

@@ -24,7 +24,8 @@ export const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
         justifyContent: 'center',
-        padding: 20
+        padding: 40,
+        gap: 100
     },
     input: {
         marginVertical: 4,
@@ -33,6 +34,12 @@ export const styles = StyleSheet.create({
         borderRadius: 4,
         padding: 10,
         backgroundColor: '#fff'
+    },
+    title: {
+        textAlign: 'center',
+        fontSize: 72,
+        fontWeight: '600',
+        color: '#fff'
     },
     text: {
         textAlign: 'center',
@@ -44,5 +51,21 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 28,
         color: '#fff'
+    },
+    infos: {
+        textAlign: 'center',
+        paddingHorizontal: 16,
+        fontSize: 18,
+        color: '#fff'
+    },
+    smallGap:{
+        gap: 4
+    },
+    gap:{
+        gap: 16
+    },
+    error: {
+        color: "red",
+        marginBottom: 10,
     },
 });
